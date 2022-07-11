@@ -1,11 +1,10 @@
 var mongoose = require("mongoose");
-const { DateTime } = require("luxon");
 var Schema = mongoose.Schema;
 
 
 var UserSchema = new Schema({
-    firstName: {type: String, maxLength: 50},
-    lastName: {type: String, maxLength: 50},
+    firstName: {type: String, maxLength: 50, minLength: 3, required: true},
+    lastName: {type: String, maxLength: 50, minLength: 3, required: true},
     username: {type: String, maxLength: 50, minLength: 3, required: true},
     password: {type: String, required: true, minLength: 8},
     membership_status: {type: String}

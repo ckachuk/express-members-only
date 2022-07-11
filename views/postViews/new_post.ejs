@@ -1,0 +1,14 @@
+<h1>Create a new post</h1>
+<% if (user) {%>
+    <form action="/new_post" method="POST">
+        <h2>Username:  <%= user.username %></h2>
+        <label for="title">Title</label>
+        <input name="title" type="text" />
+        <label for="text">Text</label>
+        <textarea name="" id="" cols="40" rows="5">Text</textarea>
+        
+        <button>POST</button>
+      </form>
+<% } else { %>
+    <a href="/login">LOGIN</a>
+<%}%>

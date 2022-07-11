@@ -7,7 +7,7 @@ var Schema = mongoose.Schema;
 var PostSchema = new Schema({
     title: {type: String, required:true, maxLength: 100},
     text: {type: String, required:true, maxLength: 144},
-    timestamp: {type:DateTime, required:true},
+    timestamp: {type:Date, required:true},
     user: {type: Schema.Types.ObjectId, ref: 'User', required:true}
 })
 
