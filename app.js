@@ -1,85 +1,34 @@
 var createError = require('http-errors');
 var express = require('express');
+var cors = require('cors');
 var path = require('path');
-var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser')
 var logger = require('morgan');
 var mongoose = require("mongoose");
-const passport = require("passport");
-const bcrypt = require("bcryptjs");
 require('dotenv').config();
-const session = require('express-session');
-const MongoStore = require('connect-mongo');
-var LocalStrategy = require("passport-local")
-var User = require("./models/user")
 var indexRouter = require('./routes/index');
-
+require('./passport')
 
 var app = express();
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
 
 mongoose.connect(process.env.DB_PATH, { useUnifiedTopology: true, useNewUrlParser: true });
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "mongo connection error"));
 
-//passport implementation
-passport.use(new LocalStrategy((username, password, done)=>{
-  User.findOne({username: username}, function(err, user){
-    if(err){ return done(err)}
-    if(!user) {return done(err, false, {message: "Incorrect username"})}
-
-    bcrypt.compare(password, user.password, (err, res)=>{
-      if(res){
-        return done(false, user)
-      }
-      else{
-        return done(err, false, {message: "Incorrect password"} )
-      }
-    })
-  })
-}))
 
 
-passport.serializeUser(function(user, done){
-  done(null, user.id)
-})
+app.use(cors())
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
-passport.deserializeUser(function(id, done) {
-  User.findById(id, function (err, user) {
-      if (err) { return cb(err); }
-      done(null, user);
-  });
-});
+app.use(express.static(path.join(__dirname, 'public')));
 
-
-app.use(session({
-  secret: process.env.SECRET,
-  resave: false,
-  saveUninitialized: true,
-  store: MongoStore.create({mongoUrl:process.env.DB_PATH,
-    useUnifiedTopology: true, 
-    useNewUrlParser: true}),
-  cookie: {
-      maxAge: 1000 * 30
-  }
-}));
-
-
-
-
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
 
 
@@ -103,6 +52,12 @@ app.use(function(err, req, res, next) {
 });
 
 
+
+var port = 5000
+
+app.listen(5000, function () {
+  console.log(' app listening on port ' + port + '!');
+});
 
 
 module.exports = app;

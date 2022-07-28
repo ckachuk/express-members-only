@@ -2,44 +2,38 @@ var express = require('express');
 var router = express.Router();
 var userController = require("../controllers/userController")
 var postController = require("../controllers/postController")
-const passport = require("passport");
+var authController = require("../controllers/authController")
+var passport = require("passport")
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { user: req.user });
-});
+router.get('/posts', postController.getAllPost);
 
-router.get('/login', userController.login_get)
+router.get('/login', authController.getLogin)
 
-router.post('/login',passport.authenticate('local',{
-  successRedirect: "/",
-  failureRedirect: "/login"
-}))
+router.post('/login', authController.postLogin)
 
-router.get("/log-out", (req, res, next)=>{
-  req.logout(function(err){
-    if(err){return next(err)}
-  })
+router.post("/log-out", authController.getLogout)
 
-  res.redirect("/")
-})
-
-router.get('/sign-up', userController.signup_get)
+router.get('/signup', userController.getSignup)
 
 
-router.post('/sign-up', userController.signup_post)
+router.post('/signup', userController.postSignup)
 
+//get priviliges
 
+router.get("/privileges",passport.authenticate('jwt', {session: false}) , userController.getPrivileges)
+
+router.post("/privileges/membership",passport.authenticate('jwt', {session: false}), userController.postMembershipStatus);
+
+router.post('/privileges/admin', userController.postAdminStatus);
 
 //posts routes
 
-router.get('/post/create', postController.post_create_get)
+router.get('/post', postController.getCreatePost)
 
-router.get('/post/create', postController.post_create_post)
+router.post('/post', passport.authenticate('jwt', {session: false}), postController.postCreatePost)
 
 
-router.get('/post/:id', postController.post_detail)
-
-router.post('/post/:id/delete', postController.post_delete)
+router.post('/post/:id/delete', passport.authenticate('jwt', {session: false}), postController.deletePost)
 
 module.exports = router;

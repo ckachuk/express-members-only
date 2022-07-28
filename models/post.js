@@ -18,4 +18,11 @@ PostSchema
     return /post/ + this._id;
 })
 
+
+PostSchema
+.virtual('timestamp_yyyy_mm_dd')
+.get(function () {
+  return DateTime.fromJSDate(this.timestamp).toISODate(); //format 'YYYY-MM-DD'
+});
+
 module.exports = mongoose.model("Post", PostSchema)
